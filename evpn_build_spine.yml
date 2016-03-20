@@ -1,5 +1,5 @@
 ---
-- name: Role for configuring Nexus 9000 leaf switches
+- name: Role for configuring Nexus 9000 spine switches
   hosts:  evpn-spine
   
   roles:
