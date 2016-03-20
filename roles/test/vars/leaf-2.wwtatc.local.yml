@@ -1,0 +1,18 @@
+! 
+loopback_ip: 2.2.2.2
+vpc_flag: True
+peer_keepalive:
+  destination: 10.255.139.185
+  source: 10.255.139.186
+channel_group_number: 100
+channel_group:
+  - interface: "Ethernet1/1"
+    description: "vPC Peer Link"
+  - interface: "Ethernet1/6"
+    description: "vPC Peer Link"
+loopback0:
+  ip_address: 2.2.2.2
+  mask: "/32"
+  s_ip_address: 10.10.10.10
+  s_mask: "/32"
+

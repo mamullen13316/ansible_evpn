@@ -1,0 +1,106 @@
+
+!
+hostname {{switchname}}
+!
+hardware access-list tcam region racl 0
+hardware access-list tcam region arp-ether 256
+!
+feature ospf
+feature pim
+feature lldp
+feature bgp
+feature nv overlay
+feature vn-segment-vlan-based
+nv overlay evpn
+feature interface-vlan
+feature lacp
+feature vpc
+feature vmtracker
+feature nxapi
+feature scheduler
+feature evmed
+!
+fabric forwarding anycast-gateway-mac 0000.DEAD.BEEF
+!
+!
+!  #####
+!  PORT CHANNEL 
+!  #####
+!
+{% if vpc_flag %}
+vpc domain 1
+  peer-switch
+  peer-keepalive destination {{peer_keepalive.destination}} source {{peer_keepalive.source}}
+  peer-gateway
+  ip arp synchronize
+!
+interface port-channel{{channel_group_number}}
+  description Port Channel for VPC peer link
+  switchport mode trunk
+  switchport trunk native vlan 999
+  vpc peer-link
+!
+{% for item in channel_group  %}
+interface {{item.interface}}
+  description {{item.description}}
+  switchport mode trunk
+  switchport trunk native vlan 999
+  channel-group {{channel_group_number}} mode active
+!
+{% endfor %}
+
+{% endif %}
+
+!
+interface loopback0
+  ip address {{loopback0.ip_address}}{{loopback0.mask}}
+  {% if vpc_flag %}
+  ip address {{loopback0.s_ip_address}}{{loopback0.s_mask}} secondary
+  {% endif %}
+  ip router ospf  {{OSPF.processID}} area 0.0.0.0
+  ip pim sparse-mode
+!
+router ospf {{OSPF.processID}}
+  router-id {{loopback0.ip_address}}
+  area 0.0.0.0 authentication message-digest
+  log-adjacency-changes
+  auto-cost reference-bandwidth 1000 Gbps
+!
+ip pim rp-address {{pim.rp_address}} group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+!
+!
+!  #####
+!  NVE 
+!  #####
+!
+interface nve1
+  no shutdown
+  source-interface loopback0
+  host-reachability protocol bgp
+!
+route-map from-direct permit 10
+  match tag 1234
+!
+!
+!  #####
+!  BGP
+!  #####
+!
+router bgp {{BGP.as}}
+ router-id {{loopback0.ip_address}}
+  address-family ipv4 unicast
+  address-family l2vpn evpn
+
+{% for item in BGP.neighbor %}
+  neighbor {{item.ip_address}} remote-as {{BGP.as}}
+    password {{item.password}}
+    update-source loopback0
+    address-family ipv4 unicast
+      send-community both
+    address-family l2vpn evpn
+      send-community both
+{% endfor %}
+!
+!
+end

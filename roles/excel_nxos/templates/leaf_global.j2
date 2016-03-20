@@ -1,0 +1,208 @@
+
+! 13leafzn01-rp01y
+hostname {{hostname}}
+!
+hardware access-list tcam region racl 0
+hardware access-list tcam region arp-ether 256
+!
+feature ospf
+feature pim
+feature lldp
+feature bgp
+feature nv overlay
+feature vn-segment-vlan-based
+nv overlay evpn
+feature interface-vlan
+feature lacp
+feature vpc
+feature vmtracker
+feature nxapi
+feature scheduler
+feature evmed
+!
+fabric forwarding anycast-gateway-mac <0000.F00D.0000>
+!
+!interface mgmt0
+!  description vPC Keepalive 13mtd-rp01 G1/7
+!  ip address 10.192.64.11/24
+!
+vlan 1,{{VLAN_range}}
+!
+vlan 100
+  name CrossOver_for_PIM_OSPF
+!
+!  #####
+!  VLAN definitions
+!  #####
+!
+{% for item in VLAN_b  %}
+vlan {{item.number}}
+  vn-segment {{item.vn_segment}}
+   name {{item.name}}
+{% endfor %}
+
+{% for item in VLAN  %}
+vlan {{item.number}}
+  vn-segment {{item.vn_segment}}
+   name {{item.name}}
+{% endfor %}
+
+!
+!  #####
+!  PORT CHANNEL 
+!  #####
+!
+vpc domain 1
+  peer-switch
+  peer-keepalive destination {{peer_keepalive.destination}} source {{peer_keepalive.source}}
+  peer-gateway
+  ip arp synchronize
+!
+interface port-channel{{channel_group_number}}
+  description Port Channel for VPC peer link
+  switchport mode trunk
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan {{VLAN_range}}
+  vpc peer-link
+!
+{% for item in channel_group  %}
+interface {{item.interface}}
+  description {{item.description}}
+  switchport mode trunk
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan {{VLAN_range}}
+  channel-group {{channel_group_number}} mode active
+!
+{% endfor %}
+
+
+interface Vlan100
+  no shutdown
+  mtu 9216
+  ip address {{Vlan100.ip_address}}
+  ip ospf network point-to-point
+  ip router ospf {{OSPF.processID}} area 0.0.0.0
+  ip pim sparse-mode
+!
+!
+interface loopback0
+  ip address {{loopback0.ip_address}}{{loopback0.mask}}
+  ip address {{loopback0.s_ip_address}}{{loopback0.s_mask}} secondary
+  ip router ospf  {{OSPF.processID}} area 0.0.0.0
+  ip pim sparse-mode
+!
+router ospf {{OSPF.processID}}
+  router-id {{loopback0.ip_address}}
+  area 0.0.0.0 authentication message-digest
+  log-adjacency-changes
+  auto-cost reference-bandwidth 1000 Gbps
+!
+ip pim rp-address {{pim.rp_address}} group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+!
+!  #####
+!  vrf context
+!  #####
+!
+{% for item in VLAN_b  %}
+vrf context {{item.vrf}}
+  vni {{item.vn_segment}}
+  rd {{item.vn_segment}}:{{loopback0.ip_address}}
+  address-family ipv4 unicast
+    route-target both {{OSPF.processID}}:{{item.vn_segment}}
+    route-target both {{OSPF.processID}}:{{item.vn_segment}} evpn
+{% endfor %}
+!
+!  #####
+!  VLAN_b
+!  #####
+!
+{% for item in VLAN_b  %}
+interface Vlan{{item.number}}
+  no shutdown
+  mtu 9216
+  vrf member {{item.vrf}}
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+{% endfor %}
+
+!
+!  #####
+!  NVE 
+!  #####
+!
+interface nve1
+  no shutdown
+  source-interface loopback0
+  host-reachability protocol bgp
+
+{% for item in VLAN  %}
+    member vni {{item.vn_segment}}
+    suppress-arp
+    mcast-group {{item.mcast_group}}
+ 
+{% endfor %}
+
+!
+!  #####
+!  member vni
+!  #####
+!
+{% for item in VLAN_b  %}
+ member vni {{item.vn_segment}} associate-vrf
+{% endfor %}
+!
+route-map from-direct permit 10
+  match tag 1234
+!
+!  #####
+!  VLAN
+!  #####
+!
+{% for item in VLAN  %}
+interface {{item.number}}
+  no shutdown
+  vrf member {{item.vrf}}
+  ip address {{item.ip_address}} tag {{item.tag}}
+  fabric forwarding mode anycast-gateway
+{% endfor %}
+!
+!  #####
+!  BGP
+!  #####
+!
+router bgp {{BGP.as}}
+ router-id {{loopback0.ip_address}}
+  address-family ipv4 unicast
+  address-family l2vpn evpn
+
+{% for item in BGP.neighbor %}
+  neighbor {{item.ip_address}} remote-as {{BGP.as}}
+    password {{item.password}}
+    update-source loopback0
+    address-family ipv4 unicast
+      send-community both
+    address-family l2vpn evpn
+      send-community both
+{% endfor %}
+
+{% for item in BGP.vrf %}
+  vrf {{item}}
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map from-direct
+{% endfor %}
+
+!  #####
+!  EVPN
+!  #####
+!
+evpn
+{% for item in BGP.vrf %}
+  vni {{item}} l2
+    rd auto
+    route-target both auto
+{% endfor %}
+!
+end

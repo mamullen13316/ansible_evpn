@@ -1,0 +1,27 @@
+---
+# tasks file for evpn_build_leaf 
+  - name: Decrypt the password file
+    include_vars: ./playbooks/passwords.yml
+
+  - name: Import host-specific facts from a XLS file
+    xls_to_facts:
+      src: "evpn_config_template.xlsx" 
+
+#  - debug: 
+#     var=username
+#  - debug:
+#     var=password
+
+  - name: Render leaf access ports
+    template:
+      src: leaf_access.j2
+      dest: "./roles/{{role}}/files/__{{switchname}}_access.cfg"
+
+  - name: Configure the leaf switches through the NX-API
+    nxapi_install_config:
+      config_file: "./roles/{{role}}/files/__{{switchname}}_access.cfg" 
+      host: "{{inventory_hostname}}"
+      username: "{{username}}"
+      password: "{{password}}"
+#      debug: "{{debug}}"
+      debug: True  

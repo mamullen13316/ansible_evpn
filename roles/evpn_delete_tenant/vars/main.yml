@@ -1,0 +1,5 @@
+---
+# vars file for evpn_add_tenant
+role: evpn_delete_tenant
+#
+#

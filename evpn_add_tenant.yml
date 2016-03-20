@@ -1,0 +1,6 @@
+---
+- name: Sample role for configuring Nexus 9000 leaf switches in the ITC
+  hosts:  evpn-leaf
+
+  roles:
+    - {role: evpn_add_tenant, debug: on}

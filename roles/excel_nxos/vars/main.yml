@@ -1,0 +1,7 @@
+---
+# vars file for excel_nxos
+#
+configuration_file:
+   - {type: "./roles/{{role}}/files/__{{hostname}}_leaf_interfaces.cfg"}
+   - {type: "./roles/{{role}}/files/__{{hostname}}_leaf_uplinks.cfg"}
+   - {type: "./roles/{{role}}/files/__{{hostname}}_leaf_global.cfg"}

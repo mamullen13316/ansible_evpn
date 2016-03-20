@@ -1,0 +1,10 @@
+OSPF:
+  message_digest_key C1sc0.123
+  processID: 1
+
+BGP:
+  as: 65000
+  password C1sc0.123
+
+pim:
+  rp_address 100.100.100.1

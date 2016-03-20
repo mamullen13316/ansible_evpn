@@ -1,0 +1,55 @@
+---
+- name: Sample role for configuring Nexus 9000 leaf switches in the ITC
+  hosts: localhost
+
+  tasks:
+    - name: Import facts from an XLS file
+      xls_to_facts:
+        src: 'evpn_config_template.xlsx'
+
+    - debug:
+        var='spreadsheet_Global'
+    - debug:
+        var='spreadsheet_Switch'
+    - debug:
+        var='spreadsheet_Uplinks'
+    - debug:
+        var='spreadsheet_Tenant'
+    - debug:
+        var='spreadsheet_VLAN'
+    - debug:
+        var='spreadsheet_Access'
+
+
+
+ 
+#  tasks:
+#  - name: get python path
+#    local_action: shell python -c 'import sys; print(":".join(sys.path))'
+#    register: pythonpath
+
+#  - debug:
+#     msg: "PYTHONPATH: {{ pythonpath.stdout }}"
+
+#  - name: try to import module
+#    local_action: shell python -c 'import requests; print(requests.packages)'
+
+
+#  tasks:
+#  - name: Try to invoke the NXAPI module
+#    nxapi_install_config:
+#      host: 10.255.139.185
+#      username: admin
+#      password: WWTwwt1!
+#      config_file: test_file
+#      debug: True
+
+  
+#  roles:
+#    - {role: test, debug: on}
+#
+# - name: Test another role in this playbook
+#  hosts: evpn-spine
+#
+#  roles:
+#    - {role: evpn_build_spine}

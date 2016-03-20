@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<aaaUser pwdLifeTime="no-password-expire" phone="703-467-5304" name="netdeploy" lastName="KING" firstName="JOEL" 
+         expires="no" expiration="never" email="netdevops@example.net" dn="uni/userext/user-netdeploy" 
+         pwd="WWTwwt1!"
+         descr="Account for PS ACI Deployment Engineer training class" clearPwdHistory="no" accountStatus="active">
+<aaaUserDomain ownerTag="" ownerKey="" name="all" descr="">
+<aaaUserRole ownerTag="" ownerKey="" name="admin" descr="" privType="writePriv"/>
+</aaaUserDomain>
+</aaaUser>

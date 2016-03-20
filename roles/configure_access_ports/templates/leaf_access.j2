@@ -1,0 +1,34 @@
+#
+# Template for access ports
+#
+{% for row in spreadsheet_Access %}
+{% if switchname == row.Hostname %}
+default interface {{row.Interface}}
+interface {{row.Interface}}
+ description {{row.Description}}
+ switchport 
+{% if row.Intf_Type == "trunk" -%}
+ switchport mode trunk
+{% endif -%}
+{% if row.Intf_Type == "access" -%}
+ switchport mode access
+ switchport access vlan {{row.Access_VLAN}}
+{% endif -%} 
+no shutdown
+{% if row.is_vPC_Member == "True" %}
+ channel-group {{row.vPC_Nbr}} force mode active
+interface port-channel{{row.vPC_Nbr}}
+ description {{row.Description}}
+ vpc {{row.vPC_Nbr}}
+{% endif %}
+!
+{% endif %}
+{% endfor %}
+end
+#
+# You should uncomment the following if you want the changes to survive a reboot
+#
+# copy running-config startup-config
+#
+send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}
+#

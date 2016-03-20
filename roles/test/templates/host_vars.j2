@@ -1,0 +1,22 @@
+! 
+{% for row in spreadsheet %}
+{% if switchname == row.hostname %}
+loopback_ip: {{row.loopback}}
+vpc_flag: {{row.vpc_flag}}
+peer_keepalive:
+  destination: {{row.vpc_pk_dst}}
+  source: {{row.vpc_pk_src}}
+channel_group_number: {{row.vpc_pl_pc_nbr}}
+channel_group:
+  - interface: "Ethernet{{row.vpcpl_int1}}"
+    description: "vPC Peer Link"
+  - interface: "Ethernet{{row.vpcpl_int2}}"
+    description: "vPC Peer Link"
+loopback0:
+  ip_address: {{row.loopback}}
+  mask: "/32"
+  s_ip_address: {{row.anycast_ip}}
+  s_mask: "/32"
+
+{% endif %}
+{% endfor %}

@@ -1,0 +1,18 @@
+#
+{% for row in spreadsheet_Tenant %}
+#
+no vlan {{row.L3_VNI_VLAN}}
+#
+no vrf context {{row.Tenant_Name}}
+#
+no interface vlan{{row.L3_VNI_VLAN}}
+#
+interface nve1
+  no member vni {{row.L3_VNID}} associate-vrf
+#
+router bgp {{spreadsheet_Global[0].BGP_AS}}
+  no vrf {{row.Tenant_Name}}
+#
+{% endfor %}
+#
+send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}

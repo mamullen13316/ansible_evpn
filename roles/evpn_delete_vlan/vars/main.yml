@@ -1,0 +1,5 @@
+---
+# vars file for evpn_add_vlan
+#
+role: evpn_delete_vlan
+#

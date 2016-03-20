@@ -1,0 +1,6 @@
+---
+# vars file for test
+role: evpn_build_spine
+
+configuration_file:
+  type: "./roles/{{role}}/files/__{{switchname}}_global.cfg"

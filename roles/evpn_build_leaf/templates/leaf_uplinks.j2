@@ -1,0 +1,29 @@
+#
+# Template for leaf uplinks
+#
+{% for row in spreadsheet_Uplinks %}
+{% if switchname == row.Hostname %}
+interface {{row.Interface}}
+  description {{row.Description}}
+  no switchport
+  mtu 9216
+  load-interval counter 1 5
+  ip address {{row.IP_Address}}
+  no ipv6 redirects
+  ip ospf authentication message-digest
+  ip ospf message-digest-key 1 md5 {{spreadsheet_Global[0].OSPF_MD5_Key}}
+  ip ospf network point-to-point
+  ip router ospf {{spreadsheet_Global[0].OSPF_Process_ID}} area 0.0.0.0
+  ip pim sparse-mode
+  no shutdown
+!
+{% endif %}
+{% endfor %}
+end
+#
+# You should uncomment the following if you want the changes to survive a reboot
+#
+# copy running-config startup-config
+#
+send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}
+#

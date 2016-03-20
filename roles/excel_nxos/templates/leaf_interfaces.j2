@@ -1,0 +1,26 @@
+#
+#  template for switch ports
+#
+#  A line starting with either a # or a ! is considered a comment and ignored
+!
+!  hostname {{hostname}}
+!
+#  Configuration build for {{inventory_hostname}}
+#
+#  Now loop through the interfaces and reference the CSV header names as variables
+#
+{% for row in spreadsheet %}
+interface {{row.SourcePort}}
+  speed {{row.Speed}}
+  description peer: {{row.DestinationDeviceHostname}}: {{row.DestinationPort}} 
+  switchport mode trunk
+  switchport trunk allowed vlan {{VLAN_range}} 
+!
+{% endfor %}
+end
+# 
+# You should uncomment the following if you want the changes to survive a reboot
+#
+# copy running-config startup-config
+#
+send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}

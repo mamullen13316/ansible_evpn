@@ -1,0 +1,7 @@
+---
+# vars file for test
+role: test
+
+configuration_file:
+  - {type: "./roles/{{role}}/files/__{{inventory_hostname}}_uplinks.cfg"}
+  - {type: "./roles/{{role}}/files/__{{inventory_hostname}}_global.cfg"}

@@ -1,0 +1,12 @@
+---
+- name: Role for configuring Nexus 9000 leaf switches
+  hosts:  evpn-leaf,evpn-spine
+  
+  roles:
+    - {role: evpn_teardown, debug: on}
+
+#- name: Role for configuring BGP and uplinks on the spine switches
+#  hosts: evpn-spine
+#  
+#  roles:
+#    - {role: evpn_update_spine, debug: on}

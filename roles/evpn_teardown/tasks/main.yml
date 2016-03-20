@@ -1,0 +1,24 @@
+---
+# tasks file for evpn_teardow
+
+  - name: Decrypt the password file
+    include_vars: ./playbooks/passwords.yml
+
+  - name: Include host-specific variables
+    include_vars: "./roles/{{role}}/vars/{{inventory_hostname}}.yml"
+
+  - name: Including the tenants to delete
+    include_vars: "./roles/{{role}}/vars/tenant.yml"
+
+  - name: Create configuration from the template
+    template:
+      src: "./roles/{{role}}/templates/config.j2"
+      dest: "./roles/{{role}}/files/{{inventory_hostname}}.cfg"
+
+  - name: Configure the Nexus through the NX-API
+    nxapi_install_config:
+      config_file: "./roles/{{role}}/files/{{inventory_hostname}}.cfg"
+      host: "{{inventory_hostname}}"
+      username: "{{username}}"
+      password: "{{password}}"
+      debug: "{{debug}}"

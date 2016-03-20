@@ -1,0 +1,4 @@
+---
+# vars file for evpn_teardown
+role: evpn_teardown
+#

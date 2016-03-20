@@ -1,0 +1,23 @@
+---
+  - name:  Create administrator account for student exercises 
+    hosts: aci
+    connection: local
+    gather_facts: no
+
+    vars_prompt:
+    - name: "APIC_password"
+      prompt: "Enter APIC password"
+      private: yes
+
+    vars:
+     local_path: ./xml
+
+    tasks:
+
+    - name: Add local user
+      aci_install_config:
+       xml_file: "{{local_path}}/aaaUser_netdeploy.xml"
+       URI: /api/mo/uni/userext.xml
+       host: "{{inventory_hostname}}"
+       username: admin 
+       password: "{{APIC_password}}"

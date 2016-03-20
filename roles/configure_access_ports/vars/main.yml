@@ -1,0 +1,3 @@
+---
+# vars file for evpn_build_leaf
+role: configure_access_ports

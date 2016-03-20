@@ -1,0 +1,18 @@
+! 
+loopback_ip: 3.3.3.3
+vpc_flag: False
+peer_keepalive:
+  destination: 
+  source: 
+channel_group_number: 
+channel_group:
+  - interface: "Ethernet"
+    description: "vPC Peer Link"
+  - interface: "Ethernet"
+    description: "vPC Peer Link"
+loopback0:
+  ip_address: 3.3.3.3
+  mask: "/32"
+  s_ip_address: 
+  s_mask: "/32"
+

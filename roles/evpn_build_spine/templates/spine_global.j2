@@ -1,0 +1,48 @@
+{% for row in spreadsheet_Switch %}
+{% if row.Hostname == switchname %}
+!
+hostname {{switchname}}
+!
+feature ospf
+feature pim
+feature lldp
+feature bgp
+feature nv overlay
+nv overlay evpn
+!
+
+!
+interface loopback0
+  ip address {{row.Loopback}}/32
+  ip router ospf {{spreadsheet_Global[0].OSPF_Process_ID}} area 0.0.0.0
+  ip pim sparse-mode
+!
+router ospf {{spreadsheet_Global[0].OSPF_Process_ID}}
+  router-id {{row.Loopback}}
+  area 0.0.0.0 authentication message-digest
+  log-adjacency-changes
+  auto-cost reference-bandwidth 1000 Gbps
+!
+ip pim rp-address {{spreadsheet_Global[0].PIM_RP}} group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+!
+router bgp {{spreadsheet_Global[0].BGP_AS}}
+ router-id {{row.Loopback}}
+  address-family ipv4 unicast
+  address-family l2vpn evpn
+    retain route-target all
+template peer vtep-peer
+  remote-as {{spreadsheet_Global[0].BGP_AS}}
+  update-source loopback0
+  password {{spreadsheet_Global[0].BGP_Password}}
+  address-family ipv4 unicast
+    send-community both
+    route-reflector-client
+  address-family l2vpn evpn
+    send-community both
+    route-reflector-client
+{% endif %}
+{% endfor %}
+!
+end
+send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}

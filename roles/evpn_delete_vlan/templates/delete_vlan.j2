@@ -1,0 +1,16 @@
+#
+{% for row in spreadsheet_VLAN %}
+no vlan {{row.VLAN_ID}}
+#
+no interface vlan{{row.VLAN_ID}}
+#
+interface nve1
+ no member vni {{row.VXLAN_ID}}
+#
+evpn
+  no vni {{row.VXLAN_ID}} l2
+#
+{% endfor %}
+#
+send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}
+#

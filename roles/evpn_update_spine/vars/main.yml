@@ -1,0 +1,7 @@
+---
+# vars file for test
+role: evpn_update_spine
+
+configuration_file:
+  - {type: "./roles/{{role}}/files/__{{switchname}}_uplinks.cfg"}
+  - {type: "./roles/{{role}}/files/__spine_global.cfg"}

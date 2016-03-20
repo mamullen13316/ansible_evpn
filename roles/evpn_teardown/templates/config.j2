@@ -1,0 +1,14 @@
+no feature vpc
+no feature ospf
+! no feature bgp
+no feature pim
+! no vlan 2-3967
+default interface {{interfaces}}
+! no int po100
+{% for item in tenant %}
+no vrf context {{item.tenant_name}}
+{% endfor %}
+no feature vn-segment-vlan-based
+no feature nv overlay
+no feature interface-vlan
+no nv overlay evpn

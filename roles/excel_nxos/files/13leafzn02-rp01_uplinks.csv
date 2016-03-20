@@ -1,0 +1,5 @@
+SourcePort,SourceIP,Description
+Ethernet2/1,10.181.0.1/31,13spine-rp01_E1/1
+Ethernet2/2,10.181.0.41/31,13spine-rp02_E1/1
+Ethernet2/3,10.181.0.81/31,13spine-rp03_E1/1
+Ethernet2/4,10.181.0.121/31,13spine-rp04_E1/1

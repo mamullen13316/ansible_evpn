@@ -1,0 +1,42 @@
+---
+# tasks file for excel_nxos 
+#  - name: Decrypt the password file
+#    include_vars: ./playbooks/passwords.yml
+
+  - name: Import facts from a CSV file for host ports
+    csv_to_facts:
+      src: "./roles/{{role}}/files/test.csv" 
+
+#  - name: Optionally display the facts
+#    debug: var=spreadsheet
+
+#  - name: Render switch host ports  configuration file 
+#    template:
+#      src: leaf_interfaces.j2 
+#      dest: "{{configuration_file[0].type}}" 
+
+ # - name: Import facts from a CSV file for uplink ports
+ #   csv_to_facts:
+ #     src: "./roles/{{role}}/files/{{hostname}}_uplinks.csv"
+
+#  - name: Optionally display the facts
+#    debug: var=spreadsheet
+
+#  - name: Render switch uplink ports
+#    template:
+#      src: leaf_uplinks.j2
+#      dest: "{{configuration_file[1].type}}"
+
+#  - name: Render switch global configuration commands 
+#    template:
+#      src: leaf_global.j2
+#      dest: "{{configuration_file[2].type}}"
+#
+#  - name: Configure the Nexus through the NX-API
+#    nxapi_install_config:
+#      config_file: "{{item.type}}" 
+#      host: "{{inventory_hostname}}"
+#      username: "{{username}}"
+#      password: "{{password}}"
+#      debug: "{{debug}}"
+#    with_items: "{{configuration_file}}"  

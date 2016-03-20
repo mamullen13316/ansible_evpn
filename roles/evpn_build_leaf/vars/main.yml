@@ -1,0 +1,7 @@
+---
+# vars file for evpn_build_leaf
+role: evpn_build_leaf
+
+configuration_file:
+  - {type: "./roles/{{role}}/files/__{{switchname}}_global.cfg"}
+  - {type: "./roles/{{role}}/files/__{{switchname}}_uplinks.cfg"}
