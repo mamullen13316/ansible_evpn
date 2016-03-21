@@ -1,6 +1,6 @@
 ---
 - name: Role for configuring Nexus 9000 spine switches
-  hosts:  evpn-spine
+  hosts:  evpn_spine
   
   roles:
     - {role: evpn_build_spine, debug: on}

@@ -1,36 +1,36 @@
 ---
 - name: Build the initial configuration on the Spine switches
-  hosts:  evpn-spine
+  hosts:  evpn_spine
   
   roles:
     - {role: evpn_build_spine, debug: on}
 
 - name: Build the leaf switches
-  hosts: evpn-leaf
+  hosts: evpn_leaf
   
   roles:
     - {role: evpn_build_leaf, debug: on}
 
 - name: Update the Spine BGP and uplink configuration
-  hosts: evpn-spine
+  hosts: evpn_spine
 
   roles:
    - {role: evpn_update_spine,debug: on}
 
 - name: Configure access ports
-  hosts: evpn-leaf
+  hosts: evpn_leaf
 
   roles:
   - {role: configure_access_ports, debug: on}
 
 - name: Add tenants
-  hosts: evpn-leaf
+  hosts: evpn_leaf
 
   roles:
   - {role: evpn_add_tenant, debug: on}
 
 - name: Add vlans
-  hosts: evpn-leaf
+  hosts: evpn_leaf
 
   roles:
   - {role: evpn_add_vlan, debug: on}
