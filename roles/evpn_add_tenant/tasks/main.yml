@@ -4,6 +4,7 @@
 
   - name: Decrypt the password file
     include_vars: ./playbooks/passwords.yml
+    no_log: True
 
   - name: Import facts from a XLS file for a new EVPN Tenant
     xls_to_facts:

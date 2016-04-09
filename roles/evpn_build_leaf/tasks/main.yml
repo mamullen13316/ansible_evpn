@@ -2,6 +2,7 @@
 # tasks file for evpn_build_leaf 
   - name: Decrypt the password file
     include_vars: ./playbooks/passwords.yml
+    no_log: True
 
   - name: Import host-specific facts from a XLS file
     xls_to_facts:

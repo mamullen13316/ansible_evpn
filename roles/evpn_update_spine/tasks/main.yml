@@ -2,7 +2,7 @@
 # tasks file for evpn_update_spine 
   - name: Decrypt the password file
     include_vars: ./playbooks/passwords.yml
-
+    no_log: True
       
   - name: Import facts from a XLS file for uplink ports
     xls_to_facts:
