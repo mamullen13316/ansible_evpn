@@ -9,8 +9,8 @@ vrf context {{row.Tenant_Name}}
   vni {{row.L3_VNID}}
   rd auto
   address-family ipv4 unicast
-  route-target import {{row.L3_VNID}}:{{row.L3_VNID}}
-  route-target export {{row.L3_VNID}}:{{row.L3_VNID}}
+!  route-target import {{row.L3_VNID}}:{{row.L3_VNID}}
+!  route-target export {{row.L3_VNID}}:{{row.L3_VNID}}
   route-target both auto
   route-target both auto evpn
 #
