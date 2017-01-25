@@ -1,7 +1,7 @@
 router bgp {{spreadsheet_Global[0].BGP_AS}}
 {% for row in spreadsheet_Switch %}
 {% if row.Function == "Leaf" %}
- neighbor {{row.Loopback}}
-  inherit peer vtep-peer
+  neighbor {{row.Loopback}}
+    inherit peer vtep-peer
 {% endif %}
 {% endfor %}

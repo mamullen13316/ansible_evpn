@@ -1,27 +1,24 @@
-#
 {% for row in spreadsheet_VLAN %}
 vlan {{row.VLAN_ID}}
   name {{row.Tenant_Name}}_VL{{row.VLAN_ID}}
   vn-segment {{row.VXLAN_ID}}
-#
+
 interface nve1
   member vni {{row.VXLAN_ID}}
-   suppress-arp
-   mcast-group {{row.Mcast_group}}
-#
+    suppress-arp
+    mcast-group {{row.Mcast_group}}
+
 evpn
   vni {{row.VXLAN_ID}} l2
     rd auto
     route-target import auto
     route-target export auto
-#
-interface vlan{{row.VLAN_ID}}
+
+interface Vlan{{row.VLAN_ID}}
   vrf member {{row.Tenant_Name}}
   ip address {{row.IP_Address}}
   fabric forwarding mode anycast-gateway
-  no shut
-#
+  no shutdown
+
 {% endfor %}
-#
-send * Configured by {{ansible_ssh_user}} from Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}
-#
+

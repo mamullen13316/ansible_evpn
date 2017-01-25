@@ -1,6 +1,18 @@
 ---
-- name: Sample role for configuring Nexus 9000 leaf switches in the ITC
+- name: Add a VLAN to the fabric
   hosts:  evpn_leaf
+
+  vars:
+    cli:
+      host: "{{ inventory_hostname }}"
+      transport: cli
+    nxapi:
+      host: "{{ inventory_hostname }}"
+      transport: nxapi
+    day: "{{ hostvars[inventory_hostname]['ansible_date_time']['date'] }}"
+    hr: "{{ hostvars[inventory_hostname]['ansible_date_time']['hour'] }}"
+    min: "{{ hostvars[inventory_hostname]['ansible_date_time']['minute'] }}"
+    sec: "{{ hostvars[inventory_hostname]['ansible_date_time']['second'] }}"
 
   roles:
     - {role: evpn_add_vlan, debug: on}

@@ -1,0 +1,22 @@
+---
+- hosts: evpn_spine,evpn_leaf
+  vars:
+    cli:
+      host: "{{ inventory_hostname }}"
+      transport: cli
+  
+  tasks:
+  - name: Roll back to initial EVPN Training Class configuration
+  
+    nxos_command:
+      commands: rollback running-config file bootflash:///evpn_training_initial_chkpt best-effort
+      timeout: 60
+      wait_for: result[0] contains success
+      provider: "{{ cli }}"
+
+  - name: Send rollback complete notification
+    
+    nxos_command:
+      commands: send * Config rollback completed by Ansible at {{ansible_date_time.date}} {{ansible_date_time.time}}
+      provider: "{{ cli }}" 
+

@@ -2,10 +2,6 @@
 
 # tasks file for evpn_add_tenant
 
-  - name: Decrypt the password file
-    include_vars: ./playbooks/passwords.yml
-    no_log: True
-
   - name: Import facts from a XLS file for a new EVPN Tenant
     xls_to_facts:
       src: "evpn_config_template.xlsx"
@@ -13,16 +9,38 @@
 #  - name: Optionally display the facts
 #    debug: var=spreadsheet
 
-  - name: Create tenant deletion configuration
+  - name: Create tenant configuration
     template:
       src: "./roles/{{role}}/templates/add_tenant.j2"
       dest: "./roles/{{role}}/files/__{{switchname}}.cfg"
 
-  - name: Configure the Nexus through the NX-API
-    nxapi_install_config:
-      config_file: "./roles/{{role}}/files/__{{switchname}}.cfg"
-      host: "{{inventory_hostname}}"
-      username: "{{username}}"
-      password: "{{password}}"
-      debug: "{{debug}}"
+  - name: Create a backup (checkpoint) of the current running configuration 
+    nxos_rollback:
+      checkpoint_file: ansible-"{{ day }}"-"{{ hr }}""{{ min }}""{{ sec }}".cfg
+      provider: "{{ cli }}"
+
+  - name: Send configuration to switch
+    nxos_config:
+      provider: "{{ cli }}"
+      src: "./roles/{{role}}/files/__{{switchname}}.cfg"
+    register: result
+
+  - name: Notify users of configuration change
+    when: "{{ result['changed'] }}"
+    nxos_command:
+      provider: "{{ cli }}"
+      commands: send * Configured by Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}
+
+  - name: Display result
+    debug: var=result verbosity=0
+
+
+
+#  - name: Configure the Nexus through the NX-API
+#    nxapi_install_config:
+#      config_file: "./roles/{{role}}/files/__{{switchname}}.cfg"
+#      host: "{{inventory_hostname}}"
+#      username: "{{username}}"
+#      password: "{{password}}"
+#      debug: "{{debug}}"
 #      debug: "true"

@@ -1,6 +1,18 @@
 ---
 - name: Role for configuring Nexus 9000 spine switches
   hosts:  evpn_spine
+  vars:
+    cli:
+      host: "{{ inventory_hostname }}"
+#      ssh_keyfile: /home/admin/.ssh/known_hosts
+      transport: cli
+    nxapi:
+      host: "{{ inventory_hostname }}"
+      transport: nxapi
+    day: "{{ hostvars[inventory_hostname]['ansible_date_time']['date'] }}"
+    hr: "{{ hostvars[inventory_hostname]['ansible_date_time']['hour'] }}"
+    min: "{{ hostvars[inventory_hostname]['ansible_date_time']['minute'] }}"
+    sec: "{{ hostvars[inventory_hostname]['ansible_date_time']['second'] }}"
   
   roles:
     - {role: evpn_build_spine, debug: on}

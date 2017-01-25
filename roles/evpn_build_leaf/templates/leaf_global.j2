@@ -1,11 +1,10 @@
 {% for row in spreadsheet_Switch %}
 {% if switchname == row.Hostname %}
-!
 hostname {{switchname}}
-!
+
 hardware access-list tcam region racl 0
 hardware access-list tcam region arp-ether 256
-!
+
 feature ospf
 feature pim
 feature lldp
@@ -15,20 +14,15 @@ feature vn-segment-vlan-based
 nv overlay evpn
 feature interface-vlan
 feature lacp
-no feature vpc
 feature vmtracker
 feature nxapi
 feature scheduler
 feature evmed
-!
+
 fabric forwarding anycast-gateway-mac 0000.DEAD.BEEF
-!
+
 spanning-tree vlan 1-3967 priority 4096
-!
-!  #####
-!  PORT CHANNEL 
-!  #####
-!
+
 {% if row.vPC_Flag == "True" %}
 feature vpc
 vpc domain 1
@@ -36,30 +30,35 @@ vpc domain 1
   peer-keepalive destination {{row.vpc_PK_DST}} source {{row.vpc_PK_SRC}}
   peer-gateway
   ip arp synchronize
-!
+
 interface Ethernet{{row.vpc_PL_int1}}
   description vPC Peer Link - Po{{row.vpc_PL_PO}}
   channel-group {{row.vpc_PL_PO}} mode active
-!
+
 interface Ethernet{{row.vpc_PL_int2}}
   description vPC Peer Link - Po{{row.vpc_PL_PO}}
   channel-group {{row.vpc_PL_PO}} mode active
-!
+
 interface port-channel{{row.vpc_PL_PO}}
   description Port Channel for VPC peer link
   switchport mode trunk
   switchport trunk native vlan 999
   vpc peer-link
-!
+
 {% endif %}
 
-!
+router ospf {{spreadsheet_Global[0].OSPF_Process_ID}}
+  router-id {{row.Loopback}}
+  area 0.0.0.0 authentication message-digest
+  log-adjacency-changes
+  auto-cost reference-bandwidth 1000 Gbps
+
 interface loopback0
   description Routing Peers
   ip address {{row.Loopback}}/32
-  ip router ospf  {{spreadsheet_Global[0].OSPF_Process_ID}} area 0.0.0.0
+  ip router ospf {{spreadsheet_Global[0].OSPF_Process_ID}} area 0.0.0.0
   ip pim sparse-mode
-!
+
 interface loopback1
   description BGP EVPN VTEP
   ip address {{row.NVE_Loopback}}/32
@@ -68,21 +67,10 @@ interface loopback1
 {% if row.vPC_Flag == "True" %}
   ip address {{row.Anycast_VTEP}}/32 secondary
 {% endif %}
-!
-router ospf {{spreadsheet_Global[0].OSPF_Process_ID}}
-  router-id {{row.Loopback}}
-  area 0.0.0.0 authentication message-digest
-  log-adjacency-changes
-  auto-cost reference-bandwidth 1000 Gbps
-!
+
 ip pim rp-address {{spreadsheet_Global[0].PIM_RP}} group-list 224.0.0.0/4
 ip pim ssm range 232.0.0.0/8
-!
-!
-!  #####
-!  NVE 
-!  #####
-!
+
 interface nve1
   no shutdown
   source-interface loopback1
@@ -91,20 +79,16 @@ interface nve1
 !
 route-map from-direct permit 10
   match tag 1234
-!
-!
-!  #####
-!  BGP
-!  #####
-!
+
 router bgp {{spreadsheet_Global[0].BGP_AS}}
- router-id {{row.Loopback}}
+  router-id {{row.Loopback}}
   address-family ipv4 unicast
   address-family l2vpn evpn
 {% for item in spreadsheet_Switch %}
 {% if item.Function == "Spine" %}
-  neighbor {{item.Loopback}} remote-as {{spreadsheet_Global[0].BGP_AS}}
-    password {{spreadsheet_Global[0].BGP_Password}}
+  neighbor {{item.Loopback}} 
+    remote-as {{spreadsheet_Global[0].BGP_AS}}
+    password 3 {{spreadsheet_Global[0].BGP_Password}}
     update-source loopback0
     address-family ipv4 unicast
       send-community both
@@ -112,8 +96,5 @@ router bgp {{spreadsheet_Global[0].BGP_AS}}
       send-community both
 {% endif %}
 {% endfor %}
-!
-!
-end
 {% endif %}
 {% endfor %}

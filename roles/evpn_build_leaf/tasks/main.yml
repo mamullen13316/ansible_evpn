@@ -1,9 +1,6 @@
 ---
 # tasks file for evpn_build_leaf 
-  - name: Decrypt the password file
-    include_vars: ./playbooks/passwords.yml
-    no_log: True
-
+  
   - name: Import host-specific facts from a XLS file
     xls_to_facts:
       src: "evpn_config_template.xlsx" 
@@ -26,11 +23,33 @@
       src: leaf_uplinks.j2
       dest: "{{configuration_file[1].type}}"
 
-  - name: Configure the leaf switches through the NX-API
-    nxapi_install_config:
-      config_file: "{{item.type}}" 
-      host: "{{inventory_hostname}}"
-      username: "{{username}}"
-      password: "{{password}}"
-      debug: "{{debug}}"
-    with_items: "{{configuration_file}}"  
+  - name: Create a backup (checkpoint) of the current running configuration 
+    nxos_rollback:
+      checkpoint_file: ansible-"{{ day }}"-"{{ hr }}""{{ min }}""{{ sec }}".cfg
+      provider: "{{ cli }}"
+
+  - name: Send configuration to device
+    nxos_config:
+      provider: "{{ cli }}"
+      src: "{{ item.type }}"
+      timeout: 20
+    register: result
+    with_items: "{{ configuration_file }}"
+
+  - name: Notify users of configuration change
+    when: "{{ result['changed'] }}"
+    nxos_command:
+      provider: "{{ cli }}"
+      commands: send * Configured by Ansible role {{role}} on {{ansible_date_time.date}} {{ansible_date_time.time}}
+
+  - name: Display result
+    debug: var=result['changed'] verbosity=0
+
+#  - name: Configure the leaf switches through the NX-API
+#    nxapi_install_config:
+#      config_file: "{{item.type}}" 
+#      host: "{{inventory_hostname}}"
+#      username: "{{username}}"
+#      password: "{{password}}"
+#      debug: "{{debug}}"
+#    with_items: "{{configuration_file}}"  
